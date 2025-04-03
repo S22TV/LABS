@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЛАБ№10 - ATM</title>
+    <link rel="shortcut icon" href="https://i.ibb.co/bg5WBRLD/logo.png" type="image/x-icon">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .atm-container {
+            background: white;
+            padding: 20px;
+            border: 3px solid #333;
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        h1, h2 {
+            margin-bottom: 10px;
+            word-wrap: break-word;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            border: none;
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        ul {
+            text-align: left;
+            padding: 0;
+            list-style-type: none;
+        }
+        li {
+            background: #e9ecef;
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        #transaction-history-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="atm-container">
+        <h1 id="hariu">Картаа хийнэ үү</h1>
+        <button id="insert-card-btn" onclick="insertCard()">Картаа хийх</button>
+
+        <h1 id="atm-title" style="display: none;">
+            Таны дансны үлдэгдэл <br><br><span id="balance">0</span>&nbsp;₮
+        </h1>
+        <button id="back-to-menu-btn" style="display: none;" onclick="ATMsystem()">Цэс-рүү буцах</button>
+
+        <div id="transaction-history-container">
+            <h2>Дансны хуулга</h2>
+            <ul id="transaction-history"></ul>
+        </div>
+    </div>
+
+    <script>
+        let uldegdel = 0;
+        const SHIMTGELE = 100;
+        let transactions = [];
+        const PIN_CODE = "9007";
+
+        function shinechlehUldegdel() {
+            document.getElementById("balance").innerText = uldegdel;
+        }
+
+        function nemekhHuilga(utga) {
+            transactions.push(utga);
+            let history = document.getElementById("transaction-history");
+            let item = document.createElement("li");
+            item.innerText = utga;
+            history.appendChild(item);
+        }
+
+        function orlogo(mungu) {
+            if (!isNaN(mungu) && mungu > 0) {
+                uldegdel += mungu;
+                shinechlehUldegdel();
+                nemekhHuilga("Орлого: +" + mungu + "₮");
+            } else {
+                alert("Буруу утга оруулсан байна.");
+            }
+        }
+
+        function zarlaga(mungu) {
+            let total = mungu + SHIMTGELE;
+            if (!isNaN(mungu) && mungu > 0 && total <= uldegdel) {
+                uldegdel -= total;
+                shinechlehUldegdel();
+                nemekhHuilga("Зарлага: -" + mungu + "₮ (Шимтгэл: " + SHIMTGELE + "₮)");
+                alert("Шилжүүлэг хийснээр " + SHIMTGELE + "₮ шимтгэл хасагдлаа.");
+            } else {
+                alert("Үлдэгдэл хүрэлцэхгүй байна.");
+            }
+        }
+
+        function ATMsystem() {
+            let running = true;
+            while (running) {
+                let a = prompt(
+                    "1. Орлого.\n2. Шилжүүлэг.\n3. Үлдэгдэл.\n4. Дансны хуулга.\n5. Картаа авах."
+                );
+
+                if (a === null) {
+                    break;
+                }
+
+                if (a === "1") {
+                    let tooOr = parseInt(prompt("Орлогын дүнгээ оруулна уу..."));
+                    orlogo(tooOr);
+                } else if (a === "2") {
+                    let tooZar = parseInt(prompt("Шилжүүлэг дүнгээ оруулна уу..."));
+                    zarlaga(tooZar);
+                } else if (a === "3") {
+                    shinechlehUldegdel();
+                    return;
+                } else if (a === "4") {
+                    document.getElementById("transaction-history-container").style.display = "block";
+                    return;
+                } else if (a === "5") {
+                    alert("Системээс гарлаа.");
+                    window.close();
+                    running = false;
+                } else {
+                    alert("Буруу дүн оруулсан байна.");
+                }
+            }
+        }
+
+        function insertCard() {
+            let pin = prompt("PIN кодоо оруулна уу:");
+
+            if (pin === null) return;
+
+            if (pin === PIN_CODE) {
+                alert("PIN код зөв. Та ATM-д амжилттай нэвтэрлээ!");
+                document.getElementById("insert-card-btn").style.display = "none";
+                document.getElementById("hariu").style.display = "none";
+                document.getElementById("atm-title").style.display = "block";
+                document.getElementById("back-to-menu-btn").style.display = "block";
+                
+                
+                setTimeout(ATMsystem, 500);
+            } else {
+                alert("Буруу PIN код. Дахин оролдоно уу!");
+            }
+        }
+    </script>
+</body>
+</html>
